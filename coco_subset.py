@@ -1,4 +1,5 @@
 import json
+import json_understand as JView
 import os
 import shutil
 #Goal: creat sub set of the whole dataset
@@ -42,6 +43,7 @@ if len(desired_category_amounts) != len(desired_category_names):
     setup_sucess = False
 
 coco_json = load_json('../coco/annotations/instances_val2017.json')
+JView.print_structure(coco_json)
 desired_category_ids = []
 desired_category_ids_to_names = {}
 for category in coco_json["categories"]:
@@ -74,6 +76,7 @@ for annotation in coco_json["annotations"]:
         #Is this an annotation that we are keeping? 
         if annotation["image_id"] in ids_of_imgs_to_keep:
             #Store and prep annottion for new .json file
+            annotation['image_id'] = old_img_ids_to_new[annotation["image_id"]]
             annotation['id'] = len(annotations_to_keep)
             annotation['category_id'] = category_name_index
             annotations_to_keep.append(annotation)
@@ -157,5 +160,25 @@ new_json_path = os.path.join(path_to_dump,'annotaions.json')
 with open(new_json_path, 'w') as file:
     #json.dump(new_json, file)
     json.dump(new_json, file, indent=4)
+
+##future improvments
+"""
+oragnize paths an requre user to just give dump file wher everyhing wil be dumped.
+    the .json file will be named the same as the old file by defoult
+
+allow user to give new names for json file and image file.
+
+allow for 2 datasets to be added at once
+make the images secontion of json and annotations in order of images
+
+make prints optional for debuging. or create logging function.
+
+allow to be run from CLI
+
+allow for user to not copy over ceretain data such as segmentation data
+
+fix bounding boxes or verify that it s correct
+
+"""
 
 
