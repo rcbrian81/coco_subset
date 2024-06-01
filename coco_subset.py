@@ -1,6 +1,6 @@
 import json
-import json_understand as JView
 import os
+import shutil
 #Goal: creat sub set of the whole dataset
 #   (1)create new train.json 
 #   (2)create new val.json 
@@ -20,7 +20,9 @@ import os
 #       save that annotation
 #   Release annotation object in og json object
 
-
+path_to_images = '../coco/images/val2017'
+path_to_dump =''
+path_to_dump = os.path.join(path_to_dump,'subset')
 
 setup_sucess = True            
 def load_json(file_path):
@@ -39,8 +41,7 @@ if len(desired_category_amounts) != len(desired_category_names):
     desired_category_amounts = []
     setup_sucess = False
 
-coco_json = load_json('coco/annotations/instances_val2017.json')
-JView.print_structure(coco_json)
+coco_json = load_json('../coco/annotations/instances_val2017.json')
 desired_category_ids = []
 desired_category_ids_to_names = {}
 for category in coco_json["categories"]:
@@ -130,12 +131,30 @@ new_json["categories"] = categories_to_keep
 
 
 
-#
+#Have: old_img_file_names_to_new dictionary
 #   rename images
+
+path_to_new__imgs_dir = os.path.join(path_to_dump,'images')
+os.makedirs(path_to_new__imgs_dir, exist_ok=True)
+
+for filename in os.listdir(path_to_images):
+    if filename in old_img_file_names_to_new:
+        new_filename = old_img_file_names_to_new[filename]
+
+        original_file_path = os.path.join(path_to_images, filename)
+        new_file_path = os.path.join(path_to_new__imgs_dir, new_filename)
+
+        shutil.copy2(original_file_path, new_file_path)
+        print(f"Copied '{filename}' to '{new_filename}'")
+
+print("All specified files have been copied.")
+
 #   create json categories with only desired categories
 #       remap cat_ids accoring to desired array
 #   create new json object and save it
-with open('new.json', 'w') as file:
+
+new_json_path = os.path.join(path_to_dump,'annotaions.json')
+with open(new_json_path, 'w') as file:
     #json.dump(new_json, file)
     json.dump(new_json, file, indent=4)
 
